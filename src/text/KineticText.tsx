@@ -113,7 +113,9 @@ export function KineticText({
 
   return (
     <>
-      <Tag ref={ref} id={id} className={className}>
+      {/* A new text remounts the element: reverting the old split after React has written
+          the new text would otherwise put the old text back. */}
+      <Tag key={children} ref={ref} id={id} className={className}>
         {children}
       </Tag>
       {distort && !reducedMotion && (
