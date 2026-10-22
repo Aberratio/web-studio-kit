@@ -13,8 +13,23 @@ export interface QualityGateProps {
   lazy?: boolean
   /** How early "near the viewport" starts. Default `200px`. */
   rootMargin?: string
+  /**
+   * Also wait until the browser is idle. For scenes above the fold: the page paints its
+   * largest content first, and the scene's JavaScript loads after. Default false.
+   */
+  idle?: boolean
   thresholds?: QualityThresholds
   className?: string
+}
+
+/** Resolves once the main thread is idle, or after `timeout` ms at the latest. */
+function whenIdle(callback: () => void, timeout = 2000): () => void {
+  if (typeof requestIdleCallback === 'function') {
+    const handle = requestIdleCallback(callback, { timeout })
+    return () => cancelIdleCallback(handle)
+  }
+  const handle = setTimeout(callback, 200)
+  return () => clearTimeout(handle)
 }
 
 /**
@@ -26,12 +41,19 @@ export function QualityGate({
   children,
   lazy = true,
   rootMargin = '200px',
+  idle = false,
   thresholds,
   className,
 }: QualityGateProps) {
   const tier = useQualityTier(thresholds)
   const ref = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState(!lazy)
+  const [settled, setSettled] = useState(!idle)
+
+  useEffect(() => {
+    if (settled || tier !== 'full') return
+    return whenIdle(() => setSettled(true))
+  }, [settled, tier])
 
   useEffect(() => {
     if (near || tier !== 'full') return
@@ -54,7 +76,7 @@ export function QualityGate({
     return () => observer.disconnect()
   }, [near, tier, rootMargin])
 
-  const full = tier === 'full' && near
+  const full = tier === 'full' && near && settled
   return (
     <div ref={ref} className={className} data-quality={full ? 'full' : 'light'}>
       {full ? children : fallback}
