@@ -27,6 +27,18 @@ export {
   type FluidColors,
   type FluidOptions,
 } from './shader/fluid.js'
+export {
+  advanceHoneyDipper,
+  HONEY_DIPPER_LAYOUTS,
+  honeyDipperFragmentShader,
+  honeyDipperUniforms,
+  resolveHoneyDipperLayout,
+  setHoneyDipperLayout,
+  type HoneyDipperColors,
+  type HoneyDipperLayout,
+  type HoneyDipperOptions,
+  type HoneyDipperPlacement,
+} from './shader/honeyDipper.js'
 export { ParticleMorph, type ParticleMorphProps } from './particles/ParticleMorph.js'
 export {
   buildMorphAttributes,

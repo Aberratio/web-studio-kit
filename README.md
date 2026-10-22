@@ -5,7 +5,7 @@ Shared building blocks for custom, 3D-heavy client websites: React Three Fiber s
 Client sites install a pinned version straight from GitHub:
 
 ```sh
-npm install github:aberratio/web-studio-kit#v0.2.2
+npm install github:aberratio/web-studio-kit#v0.3.1
 ```
 
 npm runs the `prepare` script on install, which builds `dist/` from source. Nothing built is committed.
@@ -56,6 +56,32 @@ const HeroScene = dynamic(() => import('./HeroScene'), { ssr: false })
 - `<ShaderPlane fragmentShader uniforms scroll timeScale paused />` draws a full-screen GLSL plane inside an R3F `<Canvas>`. Every shader gets `vUv` and the uniforms `uTime`, `uMouse` (0..1, origin bottom-left, smoothed, tracked over the whole window), `uScroll` and `uResolution`. `scroll` takes a number or a ref, such as the one `useScrollProgress` returns.
 - `defaultFragmentShader` and `shaderPlaneVertexShader` are the starting sources.
 - `fluidFragmentShader` with `fluidUniforms({ deep, mid, highlight }, { viscosity, distortion })` is a slow, glossy liquid (honey, oil, molten glass). The pointer pushes it, scroll darkens it.
+- `honeyDipperFragmentShader` with `honeyDipperUniforms({ honey, honeyDeep, wood, sun }, { flowSpeed, layout, scrollBoost })` (since v0.3.0) is a backlit close-up of a wooden honey dipper, raymarched from signed distance fields with no model files: a grooved head, a handle running out of frame, a honey coat on the head's lower side and a stream whose drops stretch and break off. The sun sits behind and above, so the honey glows by its thickness. The pointer turns and tilts the dipper and scroll darkens the scene.
+  - `layout` is `'center'`, `'right'` (text on the left), `'top'` (text below) or `{ x, y, scale }`. Change it later with `setHoneyDipperLayout(uniforms, layout)`, for example from a `matchMedia` listener.
+  - To let scroll speed up the flow without the drips jumping, pass `onFrame={(u, delta, scroll) => advanceHoneyDipper(u, delta, scroll)}` to `ShaderPlane`.
+  - Cost: rays that miss the dipper's bounds skip the march and the march stops after 80 steps, but it is still a raymarcher. Render it at a reduced pixel ratio (honey is soft anyway), for example `<SceneCanvas dpr={[0.6, 1]}>`.
+- `ShaderPlane`'s `onFrame(uniforms, delta, scroll)` (since v0.3.0) runs every frame after the built-in uniforms update, for shaders that keep their own state.
+
+```tsx
+const uniforms = useMemo(
+  () =>
+    honeyDipperUniforms(
+      { honey: '#f6a91f', honeyDeep: '#6e2a03', wood: '#9a6634', sun: '#ffc164' },
+      { layout: 'right' },
+    ),
+  [],
+)
+
+<SceneCanvas dpr={[0.6, 1]}>
+  <ShaderPlane
+    fragmentShader={honeyDipperFragmentShader}
+    uniforms={uniforms}
+    scroll={scrollRef}
+    onFrame={(u, delta, scroll) => advanceHoneyDipper(u, delta, scroll)}
+  />
+  <PostFX bloom={0.5} bloomThreshold={0.8} grain={0.04} />
+</SceneCanvas>
+```
 
 ### Scenes and effects (since v0.2.0)
 

@@ -89,4 +89,21 @@ describe('KineticText', () => {
     expect(heading.children).toHaveLength(0)
     expect(document.querySelector('filter')).toBeNull()
   })
+
+  it('shows the new text after the text changes', () => {
+    media.reduced = false
+    const { rerender } = render(
+      <KineticText as="h1" trigger="mount">
+        Pasieka
+      </KineticText>,
+    )
+    rerender(
+      <KineticText as="h1" trigger="mount">
+        Apiary
+      </KineticText>,
+    )
+    const heading = screen.getByRole('heading', { level: 1 })
+    expect(heading.textContent).toBe('Apiary')
+    expect(heading.getAttribute('aria-label') ?? 'Apiary').toBe('Apiary')
+  })
 })

@@ -19,6 +19,12 @@ export interface ShaderPlaneProps {
   mouseEase?: number
   /** Freeze time and pointer. */
   paused?: boolean
+  /**
+   * Called every frame (unless paused) after the built-in uniforms are updated, to animate
+   * your own uniforms. Receives the material's uniforms, the frame's delta in seconds (scaled
+   * by `timeScale`) and the current scroll value.
+   */
+  onFrame?: (uniforms: ShaderPlaneUniforms, delta: number, scroll: number) => void
 }
 
 /**
@@ -32,6 +38,7 @@ export function ShaderPlane({
   timeScale = 1,
   mouseEase = 0.08,
   paused = false,
+  onFrame,
 }: ShaderPlaneProps) {
   // Uniforms are created once; three.js reads them by reference every frame.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +74,7 @@ export function ShaderPlane({
     // Frame-rate independent easing toward the pointer.
     const ease = 1 - Math.pow(1 - mouseEase, delta * 60)
     u.uMouse.value.lerp(pointer.current, ease)
+    onFrame?.(u, delta * timeScale, u.uScroll.value)
   })
 
   return (

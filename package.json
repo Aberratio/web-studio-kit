@@ -1,6 +1,6 @@
 {
   "name": "web-studio-kit",
-  "version": "0.2.2",
+  "version": "0.3.1",
   "description": "Shared 3D, shader and scroll building blocks for web-studio client sites.",
   "license": "MIT",
   "type": "module",
