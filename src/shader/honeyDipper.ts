@@ -450,7 +450,8 @@ void main() {
     float b = (phase - 0.72) / 0.28;
     float e = b * b * (3.0 - 2.0 * b);
     gEndY = mix(yA - stretchLen, yA, e);
-    gHangR = 0.06 * smoothstep(0.0, 1.0, b);
+    // Never exactly zero: the ellipsoid distance divides by its radii.
+    gHangR = max(0.06 * smoothstep(0.0, 1.0, b), 0.001);
     gHangS = mix(1.4, 1.0, b);
     gNeck = mix(0.3, 1.0, e);
     float tau = (phase - 0.72) * 4.2;
