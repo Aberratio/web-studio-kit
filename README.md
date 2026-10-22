@@ -23,7 +23,7 @@ The site provides these, so there is exactly one copy of each:
 | `@react-three/postprocessing` | `^3`      |
 | `postprocessing`              | `^6.36`   |
 
-`lenis` is a regular dependency. All dependencies are free and open source. No paid libraries.
+`lenis` is a regular dependency. All dependencies are free. All are open source except GSAP (with ScrollTrigger and SplitText), which is free for commercial use under GSAP's own no-charge licence. No paid libraries.
 
 ## Exports
 
