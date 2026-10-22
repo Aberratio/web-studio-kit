@@ -16,6 +16,19 @@ describe('QualityGate', () => {
     window.history.replaceState(null, '', '/')
   })
 
+  it('waits for an idle moment when asked to', async () => {
+    window.history.replaceState(null, '', '/?quality=full')
+    render(
+      <QualityGate fallback={<p>static</p>} lazy={false} idle>
+        <p>scene</p>
+      </QualityGate>,
+    )
+    // The tier resolves on mount, but the scene still waits for idle time.
+    await act(async () => {})
+    expect(screen.getByText('static')).toBeTruthy()
+    expect(await screen.findByText('scene')).toBeTruthy()
+  })
+
   it('renders the fallback when the device does not qualify', async () => {
     // jsdom has no WebGL, so detection lands on light.
     renderGate(false)

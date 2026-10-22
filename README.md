@@ -5,7 +5,7 @@ Shared building blocks for custom, 3D-heavy client websites: React Three Fiber s
 Client sites install a pinned version straight from GitHub:
 
 ```sh
-npm install github:aberratio/web-studio-kit#v0.1.0
+npm install github:aberratio/web-studio-kit#v0.2.1
 ```
 
 npm runs the `prepare` script on install, which builds `dist/` from source. Nothing built is committed.
@@ -31,7 +31,7 @@ The site provides these, so there is exactly one copy of each:
 
 - `useQualityTier(thresholds?)` returns `'light'` or `'full'`. Light when the user prefers reduced motion, WebGL is missing, Save-Data is on, or the device has fewer than 4 cores or 4 GB of memory. It starts as `'light'` (also on the server), so the fallback always renders first.
 - `useQuality()` returns `{ tier, reasons }`, for debugging why a device got light mode.
-- `<QualityGate fallback={...}>` renders its children (the full scene) only on a full-tier device and only once it nears the viewport. Everywhere else it renders `fallback`. Pair it with `next/dynamic` so three.js is not even downloaded in light mode.
+- `<QualityGate fallback={...}>` renders its children (the full scene) only on a full-tier device and only once it nears the viewport. Everywhere else it renders `fallback`. Pair it with `next/dynamic` so three.js is not even downloaded in light mode. For a scene above the fold, add `idle` (since v0.2.1): it mounts once the browser is idle, so the page paints its largest content before the scene's JavaScript runs.
 - `useReducedMotion()` follows `prefers-reduced-motion` live.
 - `detectQualityTier(signals, thresholds?)` is the pure decision behind the hook.
 
@@ -62,7 +62,7 @@ const HeroScene = dynamic(() => import('./HeroScene'), { ssr: false })
 - `<SceneCanvas>` is an R3F `<Canvas>` with the studio defaults: DPR capped at 1.5, no MSAA, and no rendering while it is off screen. Use it for every scene.
 - `<ParticleMorph shapes progress color size />` morphs a cloud of points between 2–4 shapes (flat xyz `Float32Array`s) as `progress` goes from 0 to `shapes.length - 1`. Particles leave at staggered times and swirl in transit. `sampleSphere` and `seededRandom` help build shapes that look the same on every load.
 - `<PostFX bloom bloomThreshold grain />` adds bloom and film grain sized to the device: strong machines (8+ cores, 8+ GB) get full-resolution bloom and grain, the rest a half-resolution bloom. `detectEffectsBudget` is the pure rule.
-- `<KineticText as="h2" trigger="scroll" distort>` splits text into letters that rise into place (GSAP SplitText) when it mounts or scrolls into view. `distort` adds an SVG displacement that ripples the letters on arrival and under a moving pointer. Screen readers get the whole text; under reduced motion it is plain text.
+- `<KineticText as="h2" trigger="scroll" distort>` splits text into letters that rise into place (GSAP SplitText) when it mounts or scrolls into view. `distort` adds an SVG displacement that ripples the letters on arrival and under a moving pointer. Screen readers get the whole text; under reduced motion it is plain text. For a headline above the fold use `appear="settle"` (since v0.2.1): the letters are visible from the first frame and only settle into place, so they do not delay Largest Contentful Paint.
 
 Light mode still applies: wrap every scene in `QualityGate` with a static fallback, and keep `KineticText` for text that reads fine without the animation.
 

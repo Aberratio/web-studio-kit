@@ -18,6 +18,12 @@ export interface KineticTextProps {
   distort?: boolean
   /** Seconds between letters. Default 0.025. */
   stagger?: number
+  /**
+   * `rise`: letters fade in from below (default). `settle`: letters are visible from the first
+   * frame and only settle into place, which keeps a headline above the fold from delaying the
+   * page's Largest Contentful Paint.
+   */
+  appear?: 'rise' | 'settle'
 }
 
 /**
@@ -33,6 +39,7 @@ export function KineticText({
   trigger = 'scroll',
   distort = false,
   stagger = 0.025,
+  appear = 'rise',
 }: KineticTextProps) {
   const ref = useRef<HTMLElement>(null)
   const displacement = useRef<SVGFEDisplacementMapElement>(null)
@@ -51,14 +58,12 @@ export function KineticText({
         scrollTrigger:
           trigger === 'scroll' ? { trigger: element, start: 'top 85%', once: true } : undefined,
       })
-      timeline.from(split.chars, {
-        yPercent: 110,
-        rotate: 6,
-        autoAlpha: 0,
-        duration: 0.9,
-        ease: 'expo.out',
-        stagger,
-      })
+      timeline.from(
+        split.chars,
+        appear === 'settle'
+          ? { yPercent: 18, rotate: 3, duration: 1.2, ease: 'elastic.out(1, 0.6)', stagger }
+          : { yPercent: 110, rotate: 6, autoAlpha: 0, duration: 0.9, ease: 'expo.out', stagger },
+      )
       if (distort && displacement.current) {
         element.style.filter = `url(#${filterId})`
         timeline.fromTo(
@@ -95,7 +100,7 @@ export function KineticText({
       element.style.filter = ''
       context.revert()
     }
-  }, [reducedMotion, trigger, distort, stagger, filterId, children])
+  }, [reducedMotion, trigger, distort, stagger, appear, filterId, children])
 
   return (
     <>
