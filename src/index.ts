@@ -21,3 +21,20 @@ export {
   normalizePointer,
   type ShaderPlaneUniforms,
 } from './shader/uniforms.js'
+export {
+  fluidFragmentShader,
+  fluidUniforms,
+  type FluidColors,
+  type FluidOptions,
+} from './shader/fluid.js'
+export { ParticleMorph, type ParticleMorphProps } from './particles/ParticleMorph.js'
+export {
+  buildMorphAttributes,
+  MAX_MORPH_SHAPES,
+  sampleSphere,
+  seededRandom,
+} from './particles/shapes.js'
+export { SceneCanvas, type SceneCanvasProps } from './scene/SceneCanvas.js'
+export { PostFX, type PostFXProps } from './post/PostFX.js'
+export { detectEffectsBudget, readEffectsBudget, type EffectsBudget } from './post/budget.js'
+export { KineticText, type KineticTextProps } from './text/KineticText.js'

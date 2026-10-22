@@ -14,12 +14,14 @@ npm runs the `prepare` script on install, which builds `dist/` from source. Noth
 
 The site provides these, so there is exactly one copy of each:
 
-| Package              | Range     |
-| -------------------- | --------- |
-| `react`, `react-dom` | `^19`     |
-| `three`              | `>=0.170` |
-| `@react-three/fiber` | `^9`      |
-| `gsap`               | `^3.13`   |
+| Package                       | Range     |
+| ----------------------------- | --------- |
+| `react`, `react-dom`          | `^19`     |
+| `three`                       | `>=0.170` |
+| `@react-three/fiber`          | `^9`      |
+| `gsap`                        | `^3.13`   |
+| `@react-three/postprocessing` | `^3`      |
+| `postprocessing`              | `^6.36`   |
 
 `lenis` is a regular dependency. All dependencies are free and open source. No paid libraries.
 
@@ -53,8 +55,16 @@ const HeroScene = dynamic(() => import('./HeroScene'), { ssr: false })
 
 - `<ShaderPlane fragmentShader uniforms scroll timeScale paused />` draws a full-screen GLSL plane inside an R3F `<Canvas>`. Every shader gets `vUv` and the uniforms `uTime`, `uMouse` (0..1, origin bottom-left, smoothed, tracked over the whole window), `uScroll` and `uResolution`. `scroll` takes a number or a ref, such as the one `useScrollProgress` returns.
 - `defaultFragmentShader` and `shaderPlaneVertexShader` are the starting sources.
+- `fluidFragmentShader` with `fluidUniforms({ deep, mid, highlight }, { viscosity, distortion })` is a slow, glossy liquid (honey, oil, molten glass). The pointer pushes it, scroll darkens it.
 
-Cap the device pixel ratio on the canvas (`<Canvas dpr={[1, 1.5]}>`) to keep full-screen shaders cheap.
+### Scenes and effects (since v0.2.0)
+
+- `<SceneCanvas>` is an R3F `<Canvas>` with the studio defaults: DPR capped at 1.5, no MSAA, and no rendering while it is off screen. Use it for every scene.
+- `<ParticleMorph shapes progress color size />` morphs a cloud of points between 2–4 shapes (flat xyz `Float32Array`s) as `progress` goes from 0 to `shapes.length - 1`. Particles leave at staggered times and swirl in transit. `sampleSphere` and `seededRandom` help build shapes that look the same on every load.
+- `<PostFX bloom bloomThreshold grain />` adds bloom and film grain sized to the device: strong machines (8+ cores, 8+ GB) get full-resolution bloom and grain, the rest a half-resolution bloom. `detectEffectsBudget` is the pure rule.
+- `<KineticText as="h2" trigger="scroll" distort>` splits text into letters that rise into place (GSAP SplitText) when it mounts or scrolls into view. `distort` adds an SVG displacement that ripples the letters on arrival and under a moving pointer. Screen readers get the whole text; under reduced motion it is plain text.
+
+Light mode still applies: wrap every scene in `QualityGate` with a static fallback, and keep `KineticText` for text that reads fine without the animation.
 
 ## Development
 
