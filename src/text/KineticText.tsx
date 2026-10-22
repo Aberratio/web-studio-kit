@@ -19,11 +19,15 @@ export interface KineticTextProps {
   /** Seconds between letters. Default 0.025. */
   stagger?: number
   /**
-   * `rise`: letters fade in from below (default). `settle`: letters are visible from the first
-   * frame and only settle into place, which keeps a headline above the fold from delaying the
-   * page's Largest Contentful Paint.
+   * `rise`: letters fade in from below (default). `settle`: letters stay visible and settle
+   * into place. `ripple`: the text is not split at all; it ripples (with `distort`) and drifts
+   * into place as one piece.
+   *
+   * Use `ripple` for the page's Largest Contentful Paint headline. Splitting replaces the text
+   * with new elements once JavaScript runs, and the browser then counts those as a new, late
+   * LCP, even when they never stop being visible.
    */
-  appear?: 'rise' | 'settle'
+  appear?: 'rise' | 'settle' | 'ripple'
 }
 
 /**
@@ -53,17 +57,22 @@ export function KineticText({
     gsap.registerPlugin(SplitText, ScrollTrigger)
 
     const context = gsap.context(() => {
-      const split = SplitText.create(element, { type: 'words,chars', aria: 'auto' })
       const timeline = gsap.timeline({
         scrollTrigger:
           trigger === 'scroll' ? { trigger: element, start: 'top 85%', once: true } : undefined,
       })
-      timeline.from(
-        split.chars,
-        appear === 'settle'
-          ? { yPercent: 18, rotate: 3, duration: 1.2, ease: 'elastic.out(1, 0.6)', stagger }
-          : { yPercent: 110, rotate: 6, autoAlpha: 0, duration: 0.9, ease: 'expo.out', stagger },
-      )
+      if (appear === 'ripple') {
+        // The same DOM node throughout: only a transform, which never creates a new paint entry.
+        timeline.from(element, { yPercent: 8, duration: 1.4, ease: 'elastic.out(1, 0.5)' })
+      } else {
+        const split = SplitText.create(element, { type: 'words,chars', aria: 'auto' })
+        timeline.from(
+          split.chars,
+          appear === 'settle'
+            ? { yPercent: 18, rotate: 3, duration: 1.2, ease: 'elastic.out(1, 0.6)', stagger }
+            : { yPercent: 110, rotate: 6, autoAlpha: 0, duration: 0.9, ease: 'expo.out', stagger },
+        )
+      }
       if (distort && displacement.current) {
         element.style.filter = `url(#${filterId})`
         timeline.fromTo(
