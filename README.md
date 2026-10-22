@@ -5,7 +5,7 @@ Shared building blocks for custom, 3D-heavy client websites: React Three Fiber s
 Client sites install a pinned version straight from GitHub:
 
 ```sh
-npm install github:aberratio/web-studio-kit#v0.3.0
+npm install github:aberratio/web-studio-kit#v0.3.1
 ```
 
 npm runs the `prepare` script on install, which builds `dist/` from source. Nothing built is committed.
