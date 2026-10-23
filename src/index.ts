@@ -47,6 +47,12 @@ export {
   seededRandom,
 } from './particles/shapes.js'
 export { SceneCanvas, type SceneCanvasProps } from './scene/SceneCanvas.js'
+export {
+  BacklitEnvironment,
+  createBacklitEnvironmentScene,
+  type BacklitEnvironmentOptions,
+  type BacklitEnvironmentProps,
+} from './scene/BacklitEnvironment.js'
 export { PostFX, type PostFXProps } from './post/PostFX.js'
 export { detectEffectsBudget, readEffectsBudget, type EffectsBudget } from './post/budget.js'
 export { KineticText, type KineticTextProps } from './text/KineticText.js'
