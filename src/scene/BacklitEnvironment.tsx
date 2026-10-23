@@ -16,7 +16,10 @@ import {
 } from 'three'
 
 export interface BacklitEnvironmentOptions {
-  /** Colour of the sun behind the subject. Default a warm honey light, `#ffc164`. */
+  /**
+   * Colour of the sun behind the subject. Default a warm honey light, `#ffc164`. Colours are
+   * read as 8-bit sRGB; set brightness with `intensity`, not with HDR colour values.
+   */
   sun?: ColorRepresentation
   /** Colour of the dim rim light on the opposite side. Default `#ffd9a0`. */
   rim?: ColorRepresentation
