@@ -1,4 +1,4 @@
-import { Color, Mesh, MeshBasicMaterial, Vector3 } from 'three'
+import { BackSide, Color, FrontSide, Mesh, MeshBasicMaterial, Vector3 } from 'three'
 import { createBacklitEnvironmentScene } from './BacklitEnvironment.js'
 
 function mesh(name: string, scene = createBacklitEnvironmentScene()) {
@@ -17,6 +17,20 @@ describe('createBacklitEnvironmentScene', () => {
     expect(sun.z).toBeLessThan(0)
     expect(rim.x).toBeLessThan(0)
     expect(rim.z).toBeLessThan(0)
+  })
+
+  it('turns the panels to face the cube camera at the origin, and the room inwards', () => {
+    const scene = createBacklitEnvironmentScene()
+    for (const name of ['sun', 'rim']) {
+      const panel = mesh(name, scene)
+      panel.updateMatrixWorld()
+      // The plane's front face points along its local +Z.
+      const front = new Vector3(0, 0, 1).transformDirection(panel.matrixWorld)
+      const toOrigin = panel.position.clone().negate().normalize()
+      expect(front.dot(toOrigin)).toBeCloseTo(1)
+      expect(panel.material.side).toBe(FrontSide)
+    }
+    expect(mesh('room', scene).material.side).toBe(BackSide)
   })
 
   it('makes the sun brighter than white and the room dark', () => {

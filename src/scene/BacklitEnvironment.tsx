@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import {
   BackSide,
   Color,
+  FrontSide,
   type ColorRepresentation,
   Mesh,
   MeshBasicMaterial,
@@ -43,9 +44,10 @@ function panel(color: Color, size: number, direction: [number, number, number], 
   const length = Math.hypot(x, y, z) || 1
   const mesh = new Mesh(
     new PlaneGeometry(size, size),
-    new MeshBasicMaterial({ color, side: BackSide, toneMapped: false }),
+    new MeshBasicMaterial({ color, side: FrontSide, toneMapped: false }),
   )
   mesh.position.set((x / length) * distance, (y / length) * distance, (z / length) * distance)
+  // lookAt turns the plane's front face (+Z) to the origin, where the cube camera sits.
   mesh.lookAt(0, 0, 0)
   return mesh
 }
@@ -96,7 +98,13 @@ export type BacklitEnvironmentProps = BacklitEnvironmentOptions
  */
 export function BacklitEnvironment(props: BacklitEnvironmentProps) {
   const get = useThree((state) => state.get)
-  const { sun, rim, ambient, intensity, sunDirection } = props
+  const { intensity, sunDirection } = props
+  // Effect keys by value, so an inline `new Color(...)` does not rebuild the map every render.
+  const key = (value: ColorRepresentation | undefined) =>
+    value === undefined ? undefined : new Color(value).getHex()
+  const sun = key(props.sun)
+  const rim = key(props.rim)
+  const ambient = key(props.ambient)
   const direction = sunDirection?.join(',')
 
   useEffect(() => {
